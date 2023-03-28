@@ -1,0 +1,6 @@
+In Bash
+1-Run Single Test= npm run single-test
+
+2=Run Test Suit= npm run test-suit
+
+docker-

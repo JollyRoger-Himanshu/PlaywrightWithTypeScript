@@ -1,0 +1,275 @@
+import { Page } from '@playwright/test';
+import YamlReader from '../../helper/yaml_reader';
+import logger from '../../logger/Logger';
+const { Chance } = require('chance');
+import { createEmailAndToken } from '../../helper/resetLinkMailFetcher';
+const newContactData=require('../../data/testrunner_data/modified/addNewContact.test.ts.json')
+export default class AddNewContactPage {
+  private page: Page;
+  //private xpaths: any;
+  xpaths = new YamlReader('addNewContactXpaths.yaml');
+
+  contact: any;
+  // matched: boolean | undefined;
+
+  constructor(page: Page) {
+    this.page = page;
+
+    this.contact = {
+      name: '',
+      middlename: '',
+      lastname: '',
+      nickname: '',
+      email: '',
+      timezone: '',
+      phone: '',
+      jobtitle: '',
+      extension: '',
+      phonetype: '',
+      address: ''
+    };
+  }
+  addNewContact: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'addNewContact');
+  newContactFirstName: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactFirstName');
+  newContacttMiddleName: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContacttMiddleName');
+  newContactLastName: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactLastName');
+  newContactNickName: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactNickName');
+  newContactEmail: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactEmail');
+  newContactTimezone: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactTimezone');
+  newContactPhone: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactPhone');
+  newContactExtension: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactExtension');
+  newContactPhoneType: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactPhoneType');
+  newContactAddress: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactAddress');
+
+  newContactAddressStreet: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactAddressStreet');
+  newContactAddressCity: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactAddressCity');
+  newContactAddressState: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactAddressState');
+  newContactAddressPostalCode: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactAddressPostalCode');
+
+  newContactRolesCheckbox: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactRolesCheckbox');
+  newContactSaveButton: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'newContactSaveButton');
+  jobTitleContact: string = this.xpaths.getXpathFromPage('AddNewContactPage', 'jobTitleContact');
+
+  async companyAddNewContact(roleName: string) {
+    await this.clickAddNewContact();
+    await this.fillParameterToNewContactCompany();
+    await this.clickRolesCheckBox(roleName);
+    await this.clickNewContactSaveButton();
+    return this.contact.name;
+  }
+
+  async clickAddNewContact() {
+    logger.info('Cick On NewContactButton');
+    await this.page?.waitForTimeout(2000);
+    await this.page?.click(this.addNewContact);
+  }
+  async fillParameterToNewContactCompany() {
+    const emailAndToken = await createEmailAndToken();
+    logger.info('Fill parameters to add company');
+    const chance = new Chance();
+    this.contact.name = newContactData.contact.name.useChance ? chance.name() : newContactData.contact.name.default;
+    console.log("=========================>>>>"+this.contact.name);
+    this.contact.phone = newContactData.contact.phone.useChance ? chance.phone({ country: 'us' }) : newContactData.contact.phone.default;
+    console.log("=========================>>>>"+this.contact.phone);
+    this.contact.website = newContactData.contact.website.useChance ? chance.url() : newContactData.contact.website.default;
+    console.log("=========================>>>>"+this.contact.website);
+    this.contact.email = emailAndToken.emailId;
+    this.contact.lastname = newContactData.contact.lastname.useChance ? chance.lastname() : newContactData.contact.lastname.default;
+    console.log("=========================>>>>"+this.contact.lastname);
+    this.contact.jobtitle = newContactData.contact.jobtitle.useChance ? chance.jobtitle() : newContactData.contact.jobtitle.default;
+    console.log("=========================>>>>"+this.contact.jobtitle);
+    this.contact.address1 = newContactData.contact.address1.useChance ? chance.address() : newContactData.contact.address1.default;
+    console.log("=========================>>>>"+this.contact.address1);
+    this.contact.address2 = newContactData.contact.address2.useChance ? chance.address() : newContactData.contact.address2.default;
+    console.log("=========================>>>>"+this.contact.address2);
+    this.contact.city = newContactData.contact.city.useChance ? chance.city() : newContactData.contact.city.default;
+    console.log("=========================>>>>"+this.contact.city);
+    const states = [
+      'Alaska',
+      'Alabama',
+      'American Samoa',
+      'Arkansas',
+      'Arizona',
+      'California',
+      'Colorado',
+      'Connecticut',
+      'Delaware',
+      'Dist. of Columbia',
+      'Florida',
+      'Georgia',
+      'Guam',
+      'Hawaii',
+      'Idaho',
+      'Illinois',
+      'Indiana',
+      'Iowa',
+      'Kansas',
+      'Kentucky',
+      'Louisiana',
+      'Maine',
+      'Maryland',
+      'Massachusetts',
+      'Michigan',
+      'Minnesota',
+      'Mississippi',
+      'Missouri',
+      'Montana',
+      'Nebraska',
+      'Nevada',
+      'New Hampshire',
+      'New Jersey',
+      'New Mexico',
+      'New York',
+      'North Carolina',
+      'North Dakota',
+      'Ohio',
+      'Oklahoma',
+      'Oregon',
+      'Palau',
+      'Puerto Rico',
+      'Pennsylvania',
+      'Rhode Island',
+      'South Carolina',
+      'South Dakota',
+      'Tennessee',
+      'Texas',
+      'Utah',
+      'Vermont',
+      'Virginia',
+      'Washington',
+      'West Virginia',
+      'Wisconsin',
+      'Wyoming'
+    ];
+    this.contact.state =  newContactData.contact.state.useChance ? states[chance.integer({ min: 0, max: states.length - 1 })] : newContactData.contact.state.default;
+console.log("++++++++++++++++++"+this.contact.state);
+    this.contact.postal_code = newContactData.contact.postal_code.useChance ? chance.zip({ plusfour: true }) : newContactData.contact.postal_code.default;
+    console.log("++++++++++++++++++"+this.contact.postal_code);
+    this.contact.phone_type =newContactData.contact.phone_type.useChance ? ['Work', 'Mobile', 'Home'][chance.integer({ min: 0, max: 2 })] : newContactData.contact.phone_type.default;
+    console.log("++++++++++++++++++"+this.contact.phone_type);
+    this.contact.number_of_offices = newContactData.contact.number_of_offices.useChance ? chance.integer({ min: 1, max: 10 }) : newContactData.contact.number_of_offices.default;
+    console.log("++++++++++++++++++"+this.contact.number_of_offices);
+    this.contact.number_of_employees = newContactData.contact.number_of_employees.useChance ? chance.integer({ min: 1, max: 100 }) : newContactData.contact.number_of_employees.default; 
+    console.log("++++++++++++++++++"+this.contact.number_of_employees);
+    this.contact.timezone = newContactData.contact.timezone.useChance ? chance.timezone() : newContactData.contact.timezone.default;
+    console.log("++++++++++++++++++"+this.contact.timezone);
+    logger.info('Filling JobTitle as :' + this.contact.jobtitle);
+    await this.page.fill(this.jobTitleContact, this.contact.jobtitle);
+
+    logger.info('Filling User firstname ');
+    await this.page?.fill(this.newContactFirstName, this.contact.name);
+
+    logger.info('Filling User MiddleName');
+    await this.page?.fill(this.newContacttMiddleName, this.contact.middlename);
+
+    logger.info('Filling User LastName');
+    await this.page?.fill(this.newContactLastName, this.contact.lastname);
+
+    logger.info('Filling User NickName');
+    await this.page?.fill(this.newContactNickName, this.contact.nickname);
+
+    logger.info('Filling User Email');
+    await this.page?.fill(this.newContactEmail, this.contact.email);
+
+    logger.info('Enter User TimeZone');
+    await this.page?.type(this.newContactTimezone, 'Eastern Time');
+    // await this.page.locator(`//*[text()='Eastern Time']`).click();
+
+    logger.info('Filling User Phone');
+    await this.page?.fill(this.newContactPhone, this.contact.phone);
+
+    logger.info('Enter Phone Type');
+    await this.page?.type(this.newContactPhoneType, this.contact.phone_type);
+
+
+    logger.info('Filling Address');
+    await this.page?.waitForTimeout(1000);
+    await this.page?.click(this.newContactAddress);
+    await this.page?.waitForTimeout(1000);
+    await this.page?.type(this.newContactAddress, 'Add new address');
+    await this.page?.keyboard.press('Enter');
+    await this.page?.fill(this.newContactAddressStreet, this.contact.address1);
+    await this.page?.fill(this.newContactAddressCity, this.contact.city);
+    await this.page?.type(this.newContactAddressState, this.contact.state);
+    await this.page?.fill(this.newContactAddressPostalCode, this.contact.postal_code);
+
+  }
+
+  async clickRolesCheckBox(roleName: String) {
+    logger.info('Click On Roles CheckBox');
+    const loc = `//label[text()='` + roleName + `']`;
+    await this.page?.waitForSelector(loc);
+    await this.page?.click(loc);
+  }
+  async clickNewContactSaveButton() {
+    logger.info('Click On Save Button');
+    await this.page?.waitForSelector(this.newContactSaveButton);
+    await this.page?.click(this.newContactSaveButton);
+    await this.page.waitForNavigation();
+  }
+}
+
+
+//-------------------------json
+{
+    "contact":{
+        "name": {
+            "default": "Sample Company",
+            "useChance": false
+          },
+          "phone": {
+            "default": "48464161468",
+            "useChance": false
+          },
+          "website": {
+            "default": "http://www.sample.com",
+            "useChance": false
+          },
+          "lastname": {
+            "default": "Sample employee lastname",
+            "useChance": false
+          },
+          "jobtitle": {
+            "default": "Sample jobtitle",
+            "useChance": false
+          },
+          "address1": {
+            "default": "123 Sample Street",
+            "useChance": false
+          },
+          "address2":{
+            "default":"4th Avenu ",
+            "useChance":false
+          },
+          "city": {
+            "default": "Sample City",
+            "useChance": false
+          },
+          "state": {
+            "default": "Sample State",
+            "useChance": false
+          },
+          "postal_code": {
+            "default": "12345sala",
+            "useChance": false
+          },
+          "phone_type": {
+            "default": "mobile",
+            "useChance": false
+          },
+          "number_of_offices": {
+            "default": "4",
+            "useChance": false
+          },
+          "number_of_employees": {
+            "default": "48",
+            "useChance": false
+          },
+          "timezone": {
+            "default": "Eastern Time",
+            "useChance":false
+          }
+       
+
+    }
+}
